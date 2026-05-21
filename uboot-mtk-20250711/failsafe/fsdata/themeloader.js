@@ -9,29 +9,23 @@
  */
 (function () {
 	function normalizeHexColor(input) {
-		var s, hex;
 		if (!input) return null;
-		s = String(input).trim();
+		let s = String(input).trim();
 		if (s === "") return null;
 		if (s[0] === "#") s = s.slice(1);
 		if (!/^[0-9a-fA-F]{3}$/.test(s) && !/^[0-9a-fA-F]{6}$/.test(s)) return null;
-		if (s.length === 3) {
-			hex = "#" + s[0] + s[0] + s[1] + s[1] + s[2] + s[2];
-		} else {
-			hex = "#" + s;
-		}
+		const hex = s.length === 3 ? `#${s[0]}${s[0]}${s[1]}${s[1]}${s[2]}${s[2]}` : `#${s}`;
 		return hex.toLowerCase();
 	}
 
 	function normalizeThemeMode(input) {
 		if (!input) return null;
-		var s = String(input).trim().toLowerCase();
-		if (s === "auto" || s === "light" || s === "dark") return s;
-		return null;
+		const s = String(input).trim().toLowerCase();
+		return (s === "auto" || s === "light" || s === "dark") ? s : null;
 	}
 
 	function hexToRgb(hex) {
-		var n = normalizeHexColor(hex);
+		const n = normalizeHexColor(hex);
 		if (!n) return null;
 		return {
 			r: parseInt(n.slice(1, 3), 16),
@@ -41,39 +35,39 @@
 	}
 
 	function blendColor(hex, targetHex, t) {
-		var a = hexToRgb(hex);
-		var b = hexToRgb(targetHex);
+		const a = hexToRgb(hex);
+		const b = hexToRgb(targetHex);
 		if (!a || !b) return hex;
-		var r = Math.round(a.r + (b.r - a.r) * t);
-		var g = Math.round(a.g + (b.g - a.g) * t);
-		var b2 = Math.round(a.b + (b.b - a.b) * t);
-		return "#" + r.toString(16).padStart(2, "0") + g.toString(16).padStart(2, "0") + b2.toString(16).padStart(2, "0");
+		const r = Math.round(a.r + (b.r - a.r) * t);
+		const g = Math.round(a.g + (b.g - a.g) * t);
+		const bl = Math.round(a.b + (b.b - a.b) * t);
+		return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${bl.toString(16).padStart(2, "0")}`;
 	}
 
 	function setupThemeTransition(root) {
-		var timer = null;
-		var ready = false;
-		var lastThemeAttr = root.getAttribute("data-theme");
-		var durationMs = 700;
+		let timer = null;
+		let ready = false;
+		let lastThemeAttr = root.getAttribute("data-theme");
+		const durationMs = 700;
 
-		function pulse() {
+		const pulse = () => {
 			if (!ready) return;
 			if (timer) {
 				clearTimeout(timer);
 				timer = null;
 			}
 			root.classList.add("theme-transition");
-			timer = setTimeout(function () {
+			timer = setTimeout(() => {
 				root.classList.remove("theme-transition");
 				timer = null;
 			}, durationMs);
-		}
+		};
 
 		root.__failsafeThemePulse = pulse;
 
 		try {
-			var obs = new MutationObserver(function () {
-				var now = root.getAttribute("data-theme");
+			const obs = new MutationObserver(() => {
+				const now = root.getAttribute("data-theme");
 				if (now !== lastThemeAttr) {
 					lastThemeAttr = now;
 					if (root.__failsafeThemeSilent) return;
@@ -84,28 +78,26 @@
 		} catch (e) { }
 
 		try {
-			var mq = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)");
+			const mq = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)");
 			if (mq && mq.addEventListener) {
-				mq.addEventListener("change", function () {
-					var cur = root.getAttribute("data-theme");
+				mq.addEventListener("change", () => {
+					const cur = root.getAttribute("data-theme");
 					if (!cur || cur === "auto") pulse();
 				});
 			} else if (mq && mq.addListener) {
-				mq.addListener(function () {
-					var cur2 = root.getAttribute("data-theme");
+				mq.addListener(() => {
+					const cur2 = root.getAttribute("data-theme");
 					if (!cur2 || cur2 === "auto") pulse();
 				});
 			}
 		} catch (e2) { }
 
-		setTimeout(function () {
-			ready = true;
-		}, 0);
+		setTimeout(() => { ready = true; }, 0);
 	}
 
 	function getPreferredScheme() {
 		try {
-			var mq = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)");
+			const mq = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)");
 			return mq && mq.matches ? "dark" : "light";
 		} catch (e) {
 			return "light";
@@ -113,10 +105,10 @@
 	}
 
 	function applyThemeMode(root, mode, opts) {
-		var norm = normalizeThemeMode(mode) || "auto";
-		var silent = opts && opts.silent;
+		const norm = normalizeThemeMode(mode) || "auto";
+		const silent = opts && opts.silent;
 		if (!root) return;
-		var applyAttr = function (value, isAuto) {
+		const applyAttr = (value, isAuto) => {
 			if (silent) root.__failsafeThemeSilent = true;
 			if (isAuto) {
 				root.setAttribute("data-theme-auto", "1");
@@ -128,32 +120,29 @@
 			if (silent) root.__failsafeThemeSilent = false;
 		};
 
-		var scheduleApply = function (value, isAuto, shouldPulse) {
-			if (shouldPulse && root.__failsafeThemePulse)
-				root.__failsafeThemePulse();
+		const scheduleApply = (value, isAuto, shouldPulse) => {
+			if (shouldPulse && root.__failsafeThemePulse) root.__failsafeThemePulse();
 			if (silent) {
 				applyAttr(value, isAuto);
 				return;
 			}
 			if (window.requestAnimationFrame) {
-				requestAnimationFrame(function () {
-					requestAnimationFrame(function () {
+				requestAnimationFrame(() => {
+					requestAnimationFrame(() => {
 						applyAttr(value, isAuto);
 					});
 				});
 			} else {
-				setTimeout(function () {
-					applyAttr(value, isAuto);
-				}, 0);
+				setTimeout(() => applyAttr(value, isAuto), 0);
 			}
 		};
 		if (!applyThemeMode._mq) {
 			applyThemeMode._mq = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)");
 		}
 		if (!applyThemeMode._onChange) {
-			applyThemeMode._onChange = function () {
+			applyThemeMode._onChange = () => {
 				if (applyThemeMode._mode !== "auto") return;
-				var next = getPreferredScheme();
+				const next = getPreferredScheme();
 				scheduleApply(next, true, true);
 			};
 		}
@@ -172,7 +161,7 @@
 
 		applyThemeMode._mode = norm;
 		if (norm === "auto") {
-			var cur = getPreferredScheme();
+			const cur = getPreferredScheme();
 			scheduleApply(cur, true, !silent);
 		} else {
 			scheduleApply(norm, false, !silent);
@@ -180,25 +169,24 @@
 	}
 
 	try {
-		var cached = localStorage.getItem("failsafe_theme_color_cache");
-		var cachedTheme = localStorage.getItem("theme");
-		var norm = normalizeHexColor(cached);
-		var themeMode = normalizeThemeMode(cachedTheme);
-		var rgb;
-		var root;
-		var lighter;
-		var meta;
-		root = document.documentElement;
+		const cached = localStorage.getItem("failsafe_theme_color_cache");
+		const cachedTheme = localStorage.getItem("theme");
+		const norm = normalizeHexColor(cached);
+		const themeMode = normalizeThemeMode(cachedTheme);
+		let rgb;
+		const root = document.documentElement;
+		let lighter;
+		let meta;
 		setupThemeTransition(root);
 		applyThemeMode(root, themeMode || "auto", { silent: true });
-		window.__failsafeThemeApplyMode = function (mode, opts) {
+		window.__failsafeThemeApplyMode = (mode, opts) => {
 			applyThemeMode(root, mode, opts);
 		};
 		if (!norm) return;
 		rgb = hexToRgb(norm);
 		if (!rgb) return;
 		root.style.setProperty("--primary", norm);
-		root.style.setProperty("--primary-rgb", rgb.r + ", " + rgb.g + ", " + rgb.b);
+		root.style.setProperty("--primary-rgb", `${rgb.r}, ${rgb.g}, ${rgb.b}`);
 		lighter = blendColor(norm, "#ffffff", 0.28);
 		root.style.setProperty("--primary-2", lighter);
 		meta = document.querySelector("meta[name='theme-color']");

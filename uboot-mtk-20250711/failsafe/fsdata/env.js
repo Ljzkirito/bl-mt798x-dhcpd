@@ -9,12 +9,12 @@
  */
 
 function envInit() {
-    var listElement = document.getElementById("env_list");
-    var nameInput = document.getElementById("env_name");
-    var valueInput = document.getElementById("env_value");
-    var statusElement = document.getElementById("env_status");
-    var countElement = document.getElementById("env_count");
-    var fileInput = document.getElementById("env_file");
+    const listElement = document.getElementById("env_list");
+    const nameInput = document.getElementById("env_name");
+    const valueInput = document.getElementById("env_value");
+    const statusElement = document.getElementById("env_status");
+    const countElement = document.getElementById("env_count");
+    const fileInput = document.getElementById("env_file");
 
     function setStatus(message) {
         statusElement && (statusElement.textContent = message || "");
@@ -22,11 +22,10 @@ function envInit() {
 
     function countLines(text) {
         if (!text) return 0;
-        var lines = text.split("\n");
-        var lineCount = 0;
-        for (var lineIndex = 0; lineIndex < lines.length; lineIndex++) {
-            if (lines[lineIndex] && lines[lineIndex].indexOf("=") > 0)
-                lineCount++;
+        const lines = text.split("\n");
+        let lineCount = 0;
+        for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
+            if (lines[lineIndex] && lines[lineIndex].indexOf("=") > 0) lineCount++;
         }
         return lineCount;
     }
@@ -34,12 +33,12 @@ function envInit() {
     window.envRefresh = async function () {
         try {
             setStatus(t("env.status.loading"));
-            var response = await fetch("/env/list", { method: "GET" });
+            const response = await fetch("/env/list", { method: "GET" });
             if (!response.ok) {
                 setStatus(t("env.status.http") + " " + response.status);
                 return;
             }
-            var responseText = await response.text();
+            const responseText = await response.text();
             listElement && (listElement.textContent = responseText || "");
             countElement && (countElement.textContent = t("env.count") + " " + countLines(responseText));
             setStatus(t("env.status.ready"));
@@ -54,12 +53,12 @@ function envInit() {
             return;
         }
         try {
-            var formData = new FormData();
+            const formData = new FormData();
             formData.append("name", nameInput.value);
             formData.append("value", valueInput ? valueInput.value : "");
             setStatus(t("env.status.saving"));
-            var response = await fetch("/env/set", { method: "POST", body: formData });
-            var responseText = await response.text();
+            const response = await fetch("/env/set", { method: "POST", body: formData });
+            const responseText = await response.text();
             if (!response.ok) {
                 setStatus(t("env.status.error") + " " + (responseText || response.status));
                 return;
@@ -79,11 +78,11 @@ function envInit() {
         if (!confirm(t("env.confirm.delete") + " " + nameInput.value + " ?"))
             return;
         try {
-            var formData = new FormData();
+            const formData = new FormData();
             formData.append("name", nameInput.value);
             setStatus(t("env.status.saving"));
-            var response = await fetch("/env/unset", { method: "POST", body: formData });
-            var responseText = await response.text();
+            const response = await fetch("/env/unset", { method: "POST", body: formData });
+            const responseText = await response.text();
             if (!response.ok) {
                 setStatus(t("env.status.error") + " " + (responseText || response.status));
                 return;
@@ -100,8 +99,8 @@ function envInit() {
             return;
         try {
             setStatus(t("env.status.saving"));
-            var response = await fetch("/env/reset", { method: "POST" });
-            var responseText = await response.text();
+            const response = await fetch("/env/reset", { method: "POST" });
+            const responseText = await response.text();
             if (!response.ok) {
                 setStatus(t("env.status.error") + " " + (responseText || response.status));
                 return;
@@ -121,11 +120,11 @@ function envInit() {
         if (!confirm(t("env.confirm.restore")))
             return;
         try {
-            var formData = new FormData();
+            const formData = new FormData();
             formData.append("envfile", fileInput.files[0]);
             setStatus(t("env.status.saving"));
-            var response = await fetch("/env/restore", { method: "POST", body: formData });
-            var responseText = await response.text();
+            const response = await fetch("/env/restore", { method: "POST", body: formData });
+            const responseText = await response.text();
             if (!response.ok) {
                 setStatus(t("env.status.error") + " " + (responseText || response.status));
                 return;

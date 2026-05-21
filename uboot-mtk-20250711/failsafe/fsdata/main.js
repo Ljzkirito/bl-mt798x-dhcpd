@@ -8,14 +8,20 @@
  * You may not use, copy, modify or distribute this file except in compliance with the license agreement.
  */
 
+// Project/author constants (centralized for reuse)
+const AUTHOR_HANDLE = "Yuzhii0718";
+const AUTHOR_DISPLAY = "💡Yuzhii";
+const GITHUB_USER_URL = "https://github.com/Yuzhii0718/";
+const PROJECT_REPO_URL = "https://github.com/Yuzhii0718/bl-mt798x-dhcpd";
+
 function normalizeLang(input) {
     if (!input) return "en";
-    var lowerCaseLanguage = String(input).toLowerCase();
+    const lowerCaseLanguage = String(input).toLowerCase();
     return lowerCaseLanguage.indexOf("zh") === 0 ? "zh-cn" : "en";
 }
 
 function detectLang() {
-    var storedLang, navigatorLanguages;
+    let storedLang, navigatorLanguages;
     try {
         storedLang = localStorage.getItem("lang");
         if (storedLang) return normalizeLang(storedLang);
@@ -31,7 +37,7 @@ function detectLang() {
 
 function detectTheme() {
     try {
-        var storedTheme = localStorage.getItem("theme");
+        const storedTheme = localStorage.getItem("theme");
         if (storedTheme) return storedTheme;
     } catch (error) { }
     return "auto";
@@ -39,7 +45,7 @@ function detectTheme() {
 
 function normalizeThemeMode(input) {
     if (!input) return "auto";
-    var normalizedMode = String(input).toLowerCase().trim();
+    const normalizedMode = String(input).toLowerCase().trim();
     return normalizedMode === "light" || normalizedMode === "dark" || normalizedMode === "auto" ? normalizedMode : "auto";
 }
 
@@ -52,46 +58,46 @@ function isI18nEnabled() {
 }
 
 function t(key, fallback) {
-    var languageCode = APP_STATE.lang || "en";
+    const languageCode = APP_STATE.lang || "en";
     if (!isI18nEnabled() || !isI18nAvailable())
         return fallback !== undefined ? fallback : key;
     return I18N[languageCode] && I18N[languageCode][key] !== undefined ? I18N[languageCode][key] : I18N.en && I18N.en[key] !== undefined ? I18N.en[key] : (fallback !== undefined ? fallback : key);
 }
 
 function applyI18n(rootNode) {
-    var scope = rootNode || document;
-    var enabled = isI18nEnabled() && isI18nAvailable();
-    var textNodes = scope.querySelectorAll("[data-i18n]");
-    for (var textIndex = 0; textIndex < textNodes.length; textIndex++) {
-        var textNode = textNodes[textIndex];
-        var key = textNode.getAttribute("data-i18n");
+    const scope = rootNode || document;
+    const enabled = isI18nEnabled() && isI18nAvailable();
+    const textNodes = scope.querySelectorAll("[data-i18n]");
+    for (let textIndex = 0; textIndex < textNodes.length; textIndex++) {
+        const textNode = textNodes[textIndex];
+        const key = textNode.getAttribute("data-i18n");
         if (!textNode.hasAttribute("data-i18n-fallback"))
             textNode.setAttribute("data-i18n-fallback", textNode.textContent || "");
-        var fallbackText = textNode.getAttribute("data-i18n-fallback") || "";
+        const fallbackText = textNode.getAttribute("data-i18n-fallback") || "";
         textNode.textContent = enabled ? t(key, fallbackText) : fallbackText;
     }
-    var htmlNodes = scope.querySelectorAll("[data-i18n-html]");
-    for (var htmlIndex = 0; htmlIndex < htmlNodes.length; htmlIndex++) {
-        var htmlNode = htmlNodes[htmlIndex];
-        var htmlKey = htmlNode.getAttribute("data-i18n-html");
+    const htmlNodes = scope.querySelectorAll("[data-i18n-html]");
+    for (let htmlIndex = 0; htmlIndex < htmlNodes.length; htmlIndex++) {
+        const htmlNode = htmlNodes[htmlIndex];
+        const htmlKey = htmlNode.getAttribute("data-i18n-html");
         if (!htmlNode.hasAttribute("data-i18n-html-fallback"))
             htmlNode.setAttribute("data-i18n-html-fallback", htmlNode.innerHTML || "");
-        var fallbackHtml = htmlNode.getAttribute("data-i18n-html-fallback") || "";
+        const fallbackHtml = htmlNode.getAttribute("data-i18n-html-fallback") || "";
         htmlNode.innerHTML = enabled ? t(htmlKey, fallbackHtml) : fallbackHtml;
     }
-    var attributeNodes = scope.querySelectorAll("[data-i18n-attr]");
-    for (var attrIndex = 0; attrIndex < attributeNodes.length; attrIndex++) {
-        var attributeNode = attributeNodes[attrIndex];
-        var attributeSpec = attributeNode.getAttribute("data-i18n-attr");
+    const attributeNodes = scope.querySelectorAll("[data-i18n-attr]");
+    for (let attrIndex = 0; attrIndex < attributeNodes.length; attrIndex++) {
+        const attributeNode = attributeNodes[attrIndex];
+        const attributeSpec = attributeNode.getAttribute("data-i18n-attr");
         if (!attributeSpec) continue;
-        var attributeParts = attributeSpec.split(":");
+        const attributeParts = attributeSpec.split(":");
         if (attributeParts.length < 2) continue;
-        var attributeName = attributeParts[0];
-        var translationKey = attributeParts.slice(1).join(":");
-        var fallbackKey = "data-i18n-attr-fallback-" + attributeName;
+        const attributeName = attributeParts[0];
+        const translationKey = attributeParts.slice(1).join(":");
+        const fallbackKey = "data-i18n-attr-fallback-" + attributeName;
         if (!attributeNode.hasAttribute(fallbackKey))
             attributeNode.setAttribute(fallbackKey, attributeNode.getAttribute(attributeName) || "");
-        var fallbackAttribute = attributeNode.getAttribute(fallbackKey) || "";
+        const fallbackAttribute = attributeNode.getAttribute(fallbackKey) || "";
         attributeNode.setAttribute(attributeName, enabled ? t(translationKey, fallbackAttribute) : fallbackAttribute);
     }
 }
@@ -108,21 +114,21 @@ function setLang(language) {
 }
 
 function updateThemeSelect() {
-    var themeSelect = document.getElementById("theme_select");
+    const themeSelect = document.getElementById("theme_select");
     if (!themeSelect) return;
     themeSelect.value = APP_STATE.theme || "auto";
 }
 
 function setTheme(themeMode, options) {
-    var resolvedOptions = options || {};
-    var persistLocal = resolvedOptions.persistLocal !== false;
-    var persistEnv = resolvedOptions.persistEnv === true;
-    var silent = resolvedOptions.silent === true;
+    const resolvedOptions = options || {};
+    const persistLocal = resolvedOptions.persistLocal !== false;
+    const persistEnv = resolvedOptions.persistEnv === true;
+    const silent = resolvedOptions.silent === true;
     APP_STATE.theme = normalizeThemeMode(themeMode || "auto");
     try {
         persistLocal && localStorage.setItem("theme", APP_STATE.theme);
     } catch (error) { }
-    var rootElement = document.documentElement;
+    const rootElement = document.documentElement;
     if (window.__failsafeThemeApplyMode) {
         window.__failsafeThemeApplyMode(APP_STATE.theme, { silent: silent });
     } else {
@@ -132,28 +138,23 @@ function setTheme(themeMode, options) {
     persistEnv && saveThemeMode(APP_STATE.theme);
 }
 
-var THEME_COLOR_ENV_KEY = "failsafe_theme_color";
-var THEME_COLOR_CACHE_KEY = "failsafe_theme_color_cache";
-var ACCENT_PRESETS = ["#2563eb", "#0ea5e9", "#10b981", "#f59e0b", "#ef4444", "#a855f7"];
-var THEME_MODE_ENV_KEY = "failsafe_theme_mode";
+const THEME_COLOR_ENV_KEY = "failsafe_theme_color";
+const THEME_COLOR_CACHE_KEY = "failsafe_theme_color_cache";
+const ACCENT_PRESETS = ["#2563eb", "#0ea5e9", "#10b981", "#f59e0b", "#ef4444", "#a855f7"];
+const THEME_MODE_ENV_KEY = "failsafe_theme_mode";
 
 function normalizeHexColor(input) {
-    var value, hex;
     if (!input) return null;
-    value = String(input).trim();
+    let value = String(input).trim();
     if (value === "") return null;
     if (value[0] === "#") value = value.slice(1);
     if (!/^[0-9a-fA-F]{3}$/.test(value) && !/^[0-9a-fA-F]{6}$/.test(value)) return null;
-    if (value.length === 3) {
-        hex = "#" + value[0] + value[0] + value[1] + value[1] + value[2] + value[2];
-    } else {
-        hex = "#" + value;
-    }
+    const hex = value.length === 3 ? `#${value[0]}${value[0]}${value[1]}${value[1]}${value[2]}${value[2]}` : `#${value}`;
     return hex.toLowerCase();
 }
 
 function hexToRgb(hex) {
-    var normalizedHex = normalizeHexColor(hex);
+    const normalizedHex = normalizeHexColor(hex);
     if (!normalizedHex) return null;
     return {
         r: parseInt(normalizedHex.slice(1, 3), 16),
@@ -163,14 +164,15 @@ function hexToRgb(hex) {
 }
 
 function applyAccentVars(color) {
-    var normalizedColor = normalizeHexColor(color);
-    var rgb, rootElement, lighter;
+    const normalizedColor = normalizeHexColor(color);
+    let rgb;
+    let lighter;
     if (!normalizedColor) return false;
     rgb = hexToRgb(normalizedColor);
     if (!rgb) return false;
-    rootElement = document.documentElement;
+    const rootElement = document.documentElement;
     rootElement.style.setProperty("--primary", normalizedColor);
-    rootElement.style.setProperty("--primary-rgb", rgb.r + ", " + rgb.g + ", " + rgb.b);
+    rootElement.style.setProperty("--primary-rgb", `${rgb.r}, ${rgb.g}, ${rgb.b}`);
     lighter = blendColor(normalizedColor, "#ffffff", 0.28);
     rootElement.style.setProperty("--primary-2", lighter);
     ensureThemeColorMeta(normalizedColor);
@@ -178,18 +180,18 @@ function applyAccentVars(color) {
 }
 
 function blendColor(sourceHex, targetHex, ratio) {
-    var sourceRgb = hexToRgb(sourceHex);
-    var targetRgb = hexToRgb(targetHex);
+    const sourceRgb = hexToRgb(sourceHex);
+    const targetRgb = hexToRgb(targetHex);
     if (!sourceRgb || !targetRgb) return sourceHex;
-    var red = Math.round(sourceRgb.r + (targetRgb.r - sourceRgb.r) * ratio);
-    var green = Math.round(sourceRgb.g + (targetRgb.g - sourceRgb.g) * ratio);
-    var blue = Math.round(sourceRgb.b + (targetRgb.b - sourceRgb.b) * ratio);
-    return "#" + red.toString(16).padStart(2, "0") + green.toString(16).padStart(2, "0") + blue.toString(16).padStart(2, "0");
+    const red = Math.round(sourceRgb.r + (targetRgb.r - sourceRgb.r) * ratio);
+    const green = Math.round(sourceRgb.g + (targetRgb.g - sourceRgb.g) * ratio);
+    const blue = Math.round(sourceRgb.b + (targetRgb.b - sourceRgb.b) * ratio);
+    return `#${red.toString(16).padStart(2, "0")}${green.toString(16).padStart(2, "0")}${blue.toString(16).padStart(2, "0")}`;
 }
 
 function ensureThemeColorMeta(color) {
     if (!color) return;
-    var meta = document.querySelector("meta[name='theme-color']");
+    let meta = document.querySelector("meta[name='theme-color']");
     if (!meta) {
         meta = document.createElement("meta");
         meta.setAttribute("name", "theme-color");
@@ -199,15 +201,14 @@ function ensureThemeColorMeta(color) {
 }
 
 function updateAccentControls(color) {
-    var colorPicker = document.getElementById("accent_color_picker");
-    var colorInput = document.getElementById("accent_color_input");
-    var normalizedColor = normalizeHexColor(color);
-    var swatches, swatchIndex, swatch;
+    const colorPicker = document.getElementById("accent_color_picker");
+    const colorInput = document.getElementById("accent_color_input");
+    const normalizedColor = normalizeHexColor(color);
     if (colorPicker && normalizedColor) colorPicker.value = normalizedColor;
     if (colorInput && normalizedColor) colorInput.value = normalizedColor;
-    swatches = document.querySelectorAll(".color-swatch");
-    for (swatchIndex = 0; swatchIndex < swatches.length; swatchIndex++) {
-        swatch = swatches[swatchIndex];
+    const swatches = document.querySelectorAll(".color-swatch");
+    for (let swatchIndex = 0; swatchIndex < swatches.length; swatchIndex++) {
+        const swatch = swatches[swatchIndex];
         if (!swatch || !swatch.dataset) continue;
         if (normalizedColor && String(swatch.dataset.color || "").toLowerCase() === normalizedColor)
             swatch.classList.add("active");
@@ -217,7 +218,7 @@ function updateAccentControls(color) {
 }
 
 function applyAccentColor(color) {
-    var isApplied = applyAccentVars(color);
+    const isApplied = applyAccentVars(color);
     if (!isApplied) return false;
     updateAccentControls(color);
     return true;
@@ -225,43 +226,43 @@ function applyAccentColor(color) {
 
 (function applyAccentFromCache() {
     try {
-        var cachedColor = localStorage.getItem(THEME_COLOR_CACHE_KEY);
+        const cachedColor = localStorage.getItem(THEME_COLOR_CACHE_KEY);
         if (cachedColor) applyAccentVars(cachedColor);
     } catch (error) { }
 })();
 
 async function saveThemeColor(color) {
-    var normalizedColor = normalizeHexColor(color);
+    const normalizedColor = normalizeHexColor(color);
     if (!normalizedColor) return;
     try {
         localStorage.setItem(THEME_COLOR_CACHE_KEY, normalizedColor);
     } catch (error) { }
     try {
-        var formData = new FormData();
+        const formData = new FormData();
         formData.append("color", normalizedColor);
         await fetch("/theme/set", { method: "POST", body: formData });
     } catch (error) { }
 }
 
 async function saveThemeMode(theme) {
-    var normalizedMode = normalizeThemeMode(theme);
+    const normalizedMode = normalizeThemeMode(theme);
     try {
         localStorage.setItem("theme", normalizedMode);
     } catch (error) { }
     try {
-        var formData = new FormData();
+        const formData = new FormData();
         formData.append("theme", normalizedMode);
         await fetch("/theme/set", { method: "POST", body: formData });
     } catch (error) { }
 }
 
 async function loadThemeColor() {
-    var currentColor = null;
-    var loadedFromEnv = false;
+    let currentColor = null;
+    let loadedFromEnv = false;
     try {
-        var response = await fetch("/theme/get", { method: "GET" });
+        const response = await fetch("/theme/get", { method: "GET" });
         if (response && response.ok) {
-            var payload = await response.json();
+            const payload = await response.json();
             if (payload && payload.color) {
                 currentColor = normalizeHexColor(payload.color);
                 loadedFromEnv = !!currentColor;
@@ -277,8 +278,7 @@ async function loadThemeColor() {
     }
 
     if (currentColor) {
-        if (loadedFromEnv)
-            applyAccentColor(currentColor);
+        if (loadedFromEnv) applyAccentColor(currentColor);
         if (loadedFromEnv) {
             try {
                 localStorage.setItem(THEME_COLOR_CACHE_KEY, currentColor);
@@ -289,11 +289,11 @@ async function loadThemeColor() {
 }
 
 async function loadThemeMode() {
-    var mode = null;
+    let mode = null;
     try {
-        var response = await fetch("/theme/get", { method: "GET" });
+        const response = await fetch("/theme/get", { method: "GET" });
         if (response && response.ok) {
-            var payload = await response.json();
+            const payload = await response.json();
             if (payload && payload.theme) mode = normalizeThemeMode(payload.theme);
         }
     } catch (error) { }
@@ -306,53 +306,53 @@ async function loadThemeMode() {
 function appendAccentControls(container) {
     if (!container) return;
 
-    var row = document.createElement("div");
+    const row = document.createElement("div");
     row.className = "control-row control-row-color";
 
-    var accentLabel = document.createElement("div");
+    const accentLabel = document.createElement("div");
     accentLabel.setAttribute("data-i18n", "control.accent");
     accentLabel.textContent = t("control.accent");
     row.appendChild(accentLabel);
 
-    var picker = document.createElement("div");
+    const picker = document.createElement("div");
     picker.className = "color-picker";
 
-    var presets = document.createElement("div");
+    const presets = document.createElement("div");
     presets.className = "color-presets";
-    ACCENT_PRESETS.forEach(function (presetColor) {
-        var swatchButton = document.createElement("button");
+    ACCENT_PRESETS.forEach((presetColor) => {
+        const swatchButton = document.createElement("button");
         swatchButton.type = "button";
         swatchButton.className = "color-swatch";
         swatchButton.dataset.color = presetColor.toLowerCase();
         swatchButton.style.backgroundColor = presetColor;
-        swatchButton.onclick = function () {
+        swatchButton.onclick = () => {
             applyAccentColor(presetColor);
             saveThemeColor(presetColor);
         };
         presets.appendChild(swatchButton);
     });
 
-    var inputs = document.createElement("div");
+    const inputs = document.createElement("div");
     inputs.className = "color-inputs";
 
-    var colorTextInput = document.createElement("input");
+    const colorTextInput = document.createElement("input");
     colorTextInput.type = "text";
     colorTextInput.id = "accent_color_input";
     colorTextInput.setAttribute("data-i18n-attr", "placeholder:theme.color.placeholder");
     colorTextInput.placeholder = t("theme.color.placeholder");
-    colorTextInput.addEventListener("change", function () {
-        var normalizedColor = normalizeHexColor(colorTextInput.value);
+    colorTextInput.addEventListener("change", () => {
+        const normalizedColor = normalizeHexColor(colorTextInput.value);
         if (!normalizedColor) return;
         applyAccentColor(normalizedColor);
         saveThemeColor(normalizedColor);
     });
 
-    var colorPicker = document.createElement("input");
+    const colorPicker = document.createElement("input");
     colorPicker.type = "color";
     colorPicker.id = "accent_color_picker";
     colorPicker.setAttribute("data-i18n-attr", "title:theme.color.custom");
     colorPicker.title = t("theme.color.custom");
-    colorPicker.addEventListener("input", function () {
+    colorPicker.addEventListener("input", () => {
         applyAccentColor(colorPicker.value);
         saveThemeColor(colorPicker.value);
     });
@@ -368,7 +368,7 @@ function appendAccentControls(container) {
 }
 
 function ensureFavicon() {
-    var link = document.querySelector("link[rel='icon']");
+    let link = document.querySelector("link[rel='icon']");
     if (!link) {
         link = document.createElement("link");
         link.setAttribute("rel", "icon");
@@ -384,7 +384,7 @@ function updateDocumentTitle() {
     if (!isI18nEnabled() || !isI18nAvailable())
         return;
     if (APP_STATE.page) {
-        var titleKey = APP_STATE.page + ".title";
+        const titleKey = APP_STATE.page + ".title";
         if (I18N[APP_STATE.lang] && I18N[APP_STATE.lang][titleKey]) {
             document.title = t(titleKey);
             return;
@@ -394,46 +394,193 @@ function updateDocumentTitle() {
 }
 
 function ensureBranding() {
-    var versionNode = document.getElementById("version"), nextSiblingNode, brandNode;
-    versionNode && ((nextSiblingNode = versionNode.nextElementSibling, nextSiblingNode && nextSiblingNode.classList && nextSiblingNode.classList.contains("brand") && nextSiblingNode.parentNode && nextSiblingNode.parentNode.removeChild(nextSiblingNode), versionNode.querySelector && versionNode.querySelector(".brand-inline")) || (brandNode = document.createElement("span"), brandNode.className = "brand-inline", brandNode.textContent = "💡Yuzhii", versionNode.appendChild(document.createTextNode(" ")), versionNode.appendChild(brandNode)));
+    const versionNode = document.getElementById("version");
     if (!versionNode) return;
+
+    // Remove an existing sibling brand node (if present)
+    try {
+        const nextSiblingNode = versionNode.nextElementSibling;
+        if (nextSiblingNode && nextSiblingNode.classList && nextSiblingNode.classList.contains("brand") && nextSiblingNode.parentNode) {
+            nextSiblingNode.parentNode.removeChild(nextSiblingNode);
+        }
+    } catch (e) { }
+
+    // Ensure an inline brand label exists
+    if (versionNode.querySelector && !versionNode.querySelector(".brand-inline")) {
+        const brandNode = document.createElement("span");
+        brandNode.className = "brand-inline";
+        brandNode.textContent = AUTHOR_DISPLAY;
+        versionNode.appendChild(document.createTextNode(" "));
+        versionNode.appendChild(brandNode);
+    }
+
+    // Ensure project info block exists (don't duplicate)
     if (versionNode.querySelector && versionNode.querySelector("#project-info")) return;
-    var projectInfo = document.createElement("div");
+    const projectInfo = document.createElement("div");
     projectInfo.id = "project-info";
-    projectInfo.innerHTML = 'You can find more infomation about this project: <a href="https://github.com/Yuzhii0718/bl-mt798x-dhcpd" target="_blank">Github</a>';
+    projectInfo.innerHTML = `You can find more infomation about this project: <a href="${PROJECT_REPO_URL}" target="_blank">Github</a>`;
     versionNode.appendChild(projectInfo);
 }
 
 function ensureSidebar() {
-    function createNavLink(path, i18nKey, navId) {
-        var link = document.createElement("a"), iconSpan, labelSpan, normalizedPath, isActive;
+    const createNavLink = (path, i18nKey, navId) => {
+        const link = document.createElement("a");
         link.className = "nav-link";
         link.href = path;
         link.setAttribute("data-nav-id", navId);
-        iconSpan = document.createElement("span");
+
+        const iconSpan = document.createElement("span");
         iconSpan.className = "dot";
         link.appendChild(iconSpan);
-        labelSpan = document.createElement("span");
+
+        const labelSpan = document.createElement("span");
         labelSpan.setAttribute("data-i18n", i18nKey);
         labelSpan.textContent = t(i18nKey);
         link.appendChild(labelSpan);
-        normalizedPath = path;
-        normalizedPath !== "/" && normalizedPath.charAt(0) !== "/" && (normalizedPath = "/" + normalizedPath);
-        isActive = normalizedPath === currentPath || normalizedPath === "/" && (currentPath === "/" || currentPath === "/index.html");
-        isActive && link.classList.add("active");
-        return link;
-    }
 
-    var sidebar = document.getElementById("sidebar"), currentPath, brandContainer, brandTitle, controlsContainer, languageRow, languageLabel, languageSelect, themeRow, themeLabel, themeSelect, autoOption, lightOption, darkOption, navContainer, basicSection, basicTitle, advancedSection, advancedTitle, systemSection, systemTitle, gptLink, simgLink;
-    sidebar && sidebar.getAttribute("data-rendered") !== "1" && (sidebar.setAttribute("data-rendered", "1"), currentPath = location && location.pathname ? location.pathname : "", currentPath === "" && (currentPath = "/"), sidebar.innerHTML = "", brandContainer = document.createElement("div"), brandContainer.className = "sidebar-brand", brandTitle = document.createElement("div"), brandTitle.className = "title", brandTitle.setAttribute("data-i18n", "app.name"), brandTitle.textContent = t("app.name"), brandContainer.appendChild(brandTitle), sidebar.appendChild(brandContainer), controlsContainer = document.createElement("div"), controlsContainer.className = "sidebar-controls", languageRow = document.createElement("div"), languageRow.className = "control-row", languageLabel = document.createElement("div"), languageLabel.setAttribute("data-i18n", "control.language"), languageLabel.textContent = t("control.language"), languageRow.appendChild(languageLabel), languageSelect = document.createElement("select"), languageSelect.id = "lang_select", languageSelect.innerHTML = '<option value="en">English<\/option><option value="zh-cn">简体中文<\/option>', languageSelect.value = APP_STATE.lang, languageSelect.onchange = function () {
-        setLang(this.value);
-    }, languageRow.appendChild(languageSelect), controlsContainer.appendChild(languageRow), themeRow = document.createElement("div"), themeRow.className = "control-row", themeLabel = document.createElement("div"), themeLabel.setAttribute("data-i18n", "control.theme"), themeLabel.textContent = t("control.theme"), themeRow.appendChild(themeLabel), themeSelect = document.createElement("select"), themeSelect.id = "theme_select", autoOption = document.createElement("option"), autoOption.value = "auto", autoOption.setAttribute("data-i18n", "theme.auto"), autoOption.textContent = t("theme.auto"), lightOption = document.createElement("option"), lightOption.value = "light", lightOption.setAttribute("data-i18n", "theme.light"), lightOption.textContent = t("theme.light"), darkOption = document.createElement("option"), darkOption.value = "dark", darkOption.setAttribute("data-i18n", "theme.dark"), darkOption.textContent = t("theme.dark"), themeSelect.appendChild(autoOption), themeSelect.appendChild(lightOption), themeSelect.appendChild(darkOption), themeSelect.value = APP_STATE.theme, themeSelect.onchange = function () {
-        setTheme(this.value, { persistEnv: true, persistLocal: true });
-    }, themeRow.appendChild(themeSelect), controlsContainer.appendChild(themeRow), appendAccentControls(controlsContainer), sidebar.appendChild(controlsContainer), navContainer = document.createElement("div"), navContainer.className = "nav", basicSection = document.createElement("div"), basicSection.className = "nav-section", basicTitle = document.createElement("div"), basicTitle.className = "nav-section-title", basicTitle.setAttribute("data-i18n", "nav.basic"), basicTitle.textContent = t("nav.basic"), basicSection.appendChild(basicTitle), basicSection.appendChild(createNavLink("/", "nav.firmware", "firmware")), basicSection.appendChild(createNavLink("/uboot.html", "nav.uboot", "uboot")), navContainer.appendChild(basicSection), advancedSection = document.createElement("div"), advancedSection.className = "nav-section", advancedTitle = document.createElement("div"), advancedTitle.className = "nav-section-title", advancedTitle.setAttribute("data-i18n", "nav.advanced"), advancedTitle.textContent = t("nav.advanced"), advancedSection.appendChild(advancedTitle), advancedSection.appendChild(createNavLink("/bl2.html", "nav.bl2", "bl2")), gptLink = createNavLink("/gpt.html", "nav.gpt", "gpt"), gptLink.style.display = "none", advancedSection.appendChild(gptLink), simgLink = createNavLink("/simg.html", "nav.simg", "simg"), simgLink.style.display = "none", advancedSection.appendChild(simgLink), advancedSection.appendChild(createNavLink("/factory.html", "nav.factory", "factory")), advancedSection.appendChild(createNavLink("/initramfs.html", "nav.initramfs", "initramfs")), navContainer.appendChild(advancedSection), systemSection = document.createElement("div"), systemSection.className = "nav-section", systemTitle = document.createElement("div"), systemTitle.className = "nav-section-title", systemTitle.setAttribute("data-i18n", "nav.system"), systemTitle.textContent = t("nav.system"), systemSection.appendChild(systemTitle), systemSection.appendChild(createNavLink("/backup.html", "nav.backup", "backup")), systemSection.appendChild(createNavLink("/flash.html", "nav.flash", "flash")), systemSection.appendChild(createNavLink("/env.html", "nav.env", "env")), systemSection.appendChild(createNavLink("/console.html", "nav.console", "console")), systemSection.appendChild(createNavLink("/reboot.html", "nav.reboot", "reboot")), navContainer.appendChild(systemSection), sidebar.appendChild(navContainer), applyI18n(sidebar), updateGptNavVisibility(), updateSimgNavVisibility());
+        // Normalize and check active
+        let normalizedPath = path;
+        if (normalizedPath !== "/" && normalizedPath.charAt(0) !== "/") normalizedPath = "/" + normalizedPath;
+        const isActive = normalizedPath === currentPath || (normalizedPath === "/" && (currentPath === "/" || currentPath === "/index.html"));
+        if (isActive) link.classList.add("active");
+        return link;
+    };
+
+    const sidebar = document.getElementById("sidebar");
+    if (!sidebar) return;
+
+    // Avoid re-rendering
+    if (sidebar.getAttribute("data-rendered") === "1") return;
+    sidebar.setAttribute("data-rendered", "1");
+
+    // Prepare current path
+    let currentPath = (location && location.pathname) ? location.pathname : "";
+    if (currentPath === "") currentPath = "/";
+
+    // Clear existing content
+    sidebar.innerHTML = "";
+
+    // Branding
+    const brandContainer = document.createElement("div");
+    brandContainer.className = "sidebar-brand";
+    const brandTitle = document.createElement("div");
+    brandTitle.className = "title";
+    brandTitle.setAttribute("data-i18n", "app.name");
+    brandTitle.textContent = t("app.name");
+    brandContainer.appendChild(brandTitle);
+    sidebar.appendChild(brandContainer);
+
+    // Controls (language, theme, accent)
+    const controlsContainer = document.createElement("div");
+    controlsContainer.className = "sidebar-controls";
+
+    const languageRow = document.createElement("div");
+    languageRow.className = "control-row";
+    const languageLabel = document.createElement("div");
+    languageLabel.setAttribute("data-i18n", "control.language");
+    languageLabel.textContent = t("control.language");
+    languageRow.appendChild(languageLabel);
+
+    const languageSelect = document.createElement("select");
+    languageSelect.id = "lang_select";
+    languageSelect.innerHTML = '<option value="en">English</option><option value="zh-cn">简体中文</option>';
+    languageSelect.value = APP_STATE.lang;
+    languageSelect.onchange = function () { setLang(this.value); };
+    languageRow.appendChild(languageSelect);
+    controlsContainer.appendChild(languageRow);
+
+    const themeRow = document.createElement("div");
+    themeRow.className = "control-row";
+    const themeLabel = document.createElement("div");
+    themeLabel.setAttribute("data-i18n", "control.theme");
+    themeLabel.textContent = t("control.theme");
+    themeRow.appendChild(themeLabel);
+
+    const themeSelect = document.createElement("select");
+    themeSelect.id = "theme_select";
+    const autoOption = document.createElement("option");
+    autoOption.value = "auto";
+    autoOption.setAttribute("data-i18n", "theme.auto");
+    autoOption.textContent = t("theme.auto");
+    const lightOption = document.createElement("option");
+    lightOption.value = "light";
+    lightOption.setAttribute("data-i18n", "theme.light");
+    lightOption.textContent = t("theme.light");
+    const darkOption = document.createElement("option");
+    darkOption.value = "dark";
+    darkOption.setAttribute("data-i18n", "theme.dark");
+    darkOption.textContent = t("theme.dark");
+    themeSelect.appendChild(autoOption);
+    themeSelect.appendChild(lightOption);
+    themeSelect.appendChild(darkOption);
+    themeSelect.value = APP_STATE.theme;
+    themeSelect.onchange = function () { setTheme(this.value, { persistEnv: true, persistLocal: true }); };
+    themeRow.appendChild(themeSelect);
+    controlsContainer.appendChild(themeRow);
+
+    appendAccentControls(controlsContainer);
+    sidebar.appendChild(controlsContainer);
+
+    // Navigation
+    const navContainer = document.createElement("div");
+    navContainer.className = "nav";
+
+    // Basic section
+    const basicSection = document.createElement("div");
+    basicSection.className = "nav-section";
+    const basicTitle = document.createElement("div");
+    basicTitle.className = "nav-section-title";
+    basicTitle.setAttribute("data-i18n", "nav.basic");
+    basicTitle.textContent = t("nav.basic");
+    basicSection.appendChild(basicTitle);
+    basicSection.appendChild(createNavLink("/", "nav.firmware", "firmware"));
+    basicSection.appendChild(createNavLink("/uboot.html", "nav.uboot", "uboot"));
+    navContainer.appendChild(basicSection);
+
+    // Advanced section
+    const advancedSection = document.createElement("div");
+    advancedSection.className = "nav-section";
+    const advancedTitle = document.createElement("div");
+    advancedTitle.className = "nav-section-title";
+    advancedTitle.setAttribute("data-i18n", "nav.advanced");
+    advancedTitle.textContent = t("nav.advanced");
+    advancedSection.appendChild(advancedTitle);
+    advancedSection.appendChild(createNavLink("/bl2.html", "nav.bl2", "bl2"));
+    const gptLink = createNavLink("/gpt.html", "nav.gpt", "gpt");
+    gptLink.style.display = "none";
+    advancedSection.appendChild(gptLink);
+    const simgLink = createNavLink("/simg.html", "nav.simg", "simg");
+    simgLink.style.display = "none";
+    advancedSection.appendChild(simgLink);
+    advancedSection.appendChild(createNavLink("/factory.html", "nav.factory", "factory"));
+    advancedSection.appendChild(createNavLink("/initramfs.html", "nav.initramfs", "initramfs"));
+    navContainer.appendChild(advancedSection);
+
+    // System section
+    const systemSection = document.createElement("div");
+    systemSection.className = "nav-section";
+    const systemTitle = document.createElement("div");
+    systemTitle.className = "nav-section-title";
+    systemTitle.setAttribute("data-i18n", "nav.system");
+    systemTitle.textContent = t("nav.system");
+    systemSection.appendChild(systemTitle);
+    systemSection.appendChild(createNavLink("/backup.html", "nav.backup", "backup"));
+    systemSection.appendChild(createNavLink("/flash.html", "nav.flash", "flash"));
+    systemSection.appendChild(createNavLink("/env.html", "nav.env", "env"));
+    systemSection.appendChild(createNavLink("/console.html", "nav.console", "console"));
+    systemSection.appendChild(createNavLink("/reboot.html", "nav.reboot", "reboot"));
+    navContainer.appendChild(systemSection);
+
+    sidebar.appendChild(navContainer);
+
+    applyI18n(sidebar);
+    updateGptNavVisibility();
+    updateSimgNavVisibility();
 }
 
 function ajax(request) {
-    var xhr, method;
+    let xhr;
+    let method;
     xhr = window.XMLHttpRequest ? new XMLHttpRequest : new ActiveXObject("Microsoft.XMLHTTP");
     xhr.upload.addEventListener("progress", function (event) {
         request.progress && request.progress(event);
@@ -488,9 +635,9 @@ function appInit(pageName) {
 function updateGptNavVisibility() {
     // Hide GPT update entry when no MMC is present (runtime detection).
     // If backupinfo is unavailable, keep it visible (fallback behavior).
-    var gptNavLink = document.querySelector("#sidebar [data-nav-id='gpt']");
+    const gptNavLink = document.querySelector("#sidebar [data-nav-id='gpt']");
     if (!gptNavLink) return;
-    var backupInfo = APP_STATE.backupinfo;
+    const backupInfo = APP_STATE.backupinfo;
     if (!backupInfo || !backupInfo.mmc || typeof backupInfo.mmc.present === "undefined") {
         gptNavLink.style.display = "none";
         return;
@@ -501,7 +648,7 @@ function updateGptNavVisibility() {
 
 function updateSimgNavVisibility() {
     // Hide Single Image entry unless the page is actually served.
-    var simgNavLink = document.querySelector("#sidebar [data-nav-id='simg']");
+    const simgNavLink = document.querySelector("#sidebar [data-nav-id='simg']");
     if (!simgNavLink) return;
     simgNavLink.style.display = "none";
 
@@ -526,7 +673,10 @@ function updateSimgNavVisibility() {
 }
 
 function renderSysInfo() {
-    var sysinfoContainer = document.getElementById("sysinfo"), sysinfoData, boardInfo, ramInfo;
+    const sysinfoContainer = document.getElementById("sysinfo");
+    let sysinfoData;
+    let boardInfo;
+    let ramInfo;
     if (!sysinfoContainer) return;
     sysinfoData = APP_STATE.sysinfo;
     if (!sysinfoData) {
@@ -539,23 +689,23 @@ function renderSysInfo() {
     while (sysinfoContainer.firstChild) sysinfoContainer.removeChild(sysinfoContainer.firstChild);
     sysinfoContainer.classList.remove("sysinfo-expanded");
 
-    var summary = document.createElement("div");
+    const summary = document.createElement("div");
     summary.className = "sysinfo-summary";
 
-    var boardLine = document.createElement("div");
+    const boardLine = document.createElement("div");
     boardLine.className = "sysinfo-line";
     boardLine.textContent = t("sysinfo.board") + " " + (boardInfo.model || t("sysinfo.unknown"));
     summary.appendChild(boardLine);
 
-    var ramLine = document.createElement("div");
+    const ramLine = document.createElement("div");
     ramLine.className = "sysinfo-line";
     ramLine.textContent = t("sysinfo.ram") + " " + (ramInfo.size !== undefined && ramInfo.size !== null && ramInfo.size !== 0 ? bytesToHuman(ramInfo.size) : t("sysinfo.unknown"));
     summary.appendChild(ramLine);
 
     if (sysinfoData.storage && sysinfoData.storage.mtd_layout) {
-        var mtdSummary = sysinfoData.storage.mtd_layout || {};
+        const mtdSummary = sysinfoData.storage.mtd_layout || {};
         if (mtdSummary.current) {
-            var curLayoutLine = document.createElement("div");
+            const curLayoutLine = document.createElement("div");
             curLayoutLine.className = "sysinfo-line";
             curLayoutLine.textContent = t("sysinfo.mtd.current", "MTD layout") + " " + mtdSummary.current;
             summary.appendChild(curLayoutLine);
@@ -564,19 +714,19 @@ function renderSysInfo() {
 
     sysinfoContainer.appendChild(summary);
 
-    var details = document.createElement("details");
+    const details = document.createElement("details");
     details.className = "sysinfo-details";
 
-    var summaryNode = document.createElement("summary");
+    const summaryNode = document.createElement("summary");
     summaryNode.textContent = t("sysinfo.more", "More info");
     details.appendChild(summaryNode);
 
-    var extra = document.createElement("div");
+    const extra = document.createElement("div");
     extra.className = "sysinfo-extra";
 
     if (sysinfoData.storage && sysinfoData.storage.mtd_layout) {
         if (mtdSummary.current_parts) {
-            var curPartsLine = document.createElement("div");
+            const curPartsLine = document.createElement("div");
             curPartsLine.className = "sysinfo-line sysinfo-mtdparts";
             curPartsLine.textContent = t("sysinfo.mtd.parts", "MTD parts") + " " + mtdSummary.current_parts;
             extra.appendChild(curPartsLine);
@@ -584,34 +734,34 @@ function renderSysInfo() {
     }
 
     if (sysinfoData.build_variant) {
-        var variantLine = document.createElement("div");
+        const variantLine = document.createElement("div");
         variantLine.className = "sysinfo-line";
         variantLine.textContent = t("sysinfo.variant", "Variant") + " " + sysinfoData.build_variant;
         extra.appendChild(variantLine);
     }
 
     if (boardInfo.compatible) {
-        var compatLine = document.createElement("div");
+        const compatLine = document.createElement("div");
         compatLine.className = "sysinfo-line";
         compatLine.textContent = t("sysinfo.compat", "Compatible") + " " + boardInfo.compatible;
         extra.appendChild(compatLine);
     }
 
     if (sysinfoData.storage && sysinfoData.storage.mtd_layout) {
-        var mtdLayoutInfo = sysinfoData.storage.mtd_layout || {};
-        var layouts = mtdLayoutInfo.layouts || [];
+        const mtdLayoutInfo = sysinfoData.storage.mtd_layout || {};
+        const layouts = mtdLayoutInfo.layouts || [];
         if (layouts && layouts.length) {
-            var layoutTitle = document.createElement("div");
+            const layoutTitle = document.createElement("div");
             layoutTitle.className = "sysinfo-line sysinfo-section";
             layoutTitle.textContent = t("sysinfo.mtd.layouts", "MTD layouts");
             extra.appendChild(layoutTitle);
 
-            var layoutList = document.createElement("ul");
+            const layoutList = document.createElement("ul");
             layoutList.className = "sysinfo-list";
-            for (var layoutIndex = 0; layoutIndex < layouts.length; layoutIndex++) {
-                var item = layouts[layoutIndex] || {};
-                var entry = document.createElement("li");
-                var parts = item.parts ? " " + item.parts : "";
+            for (let layoutIndex = 0; layoutIndex < layouts.length; layoutIndex++) {
+                const item = layouts[layoutIndex] || {};
+                const entry = document.createElement("li");
+                const parts = item.parts ? " " + item.parts : "";
                 entry.textContent = (item.label || "-") + ":" + parts;
                 layoutList.appendChild(entry);
             }
@@ -620,25 +770,25 @@ function renderSysInfo() {
     }
 
     if (sysinfoData.storage && sysinfoData.storage.mmc && sysinfoData.storage.mmc.present) {
-        var mmcInfo = sysinfoData.storage.mmc;
-        var mmcTitle = document.createElement("div");
+        const mmcInfo = sysinfoData.storage.mmc;
+        const mmcTitle = document.createElement("div");
         mmcTitle.className = "sysinfo-line sysinfo-section";
         mmcTitle.textContent = t("sysinfo.mmc", "MMC partitions");
         extra.appendChild(mmcTitle);
 
         if (mmcInfo.parts && mmcInfo.parts.length) {
-            var list = document.createElement("ul");
+            const list = document.createElement("ul");
             list.className = "sysinfo-list";
-            for (var partitionIndex = 0; partitionIndex < mmcInfo.parts.length; partitionIndex++) {
-                var partition = mmcInfo.parts[partitionIndex];
-                var listItem = document.createElement("li");
-                var sizeText = partition.size ? bytesToHuman(partition.size) : t("sysinfo.unknown");
+            for (let partitionIndex = 0; partitionIndex < mmcInfo.parts.length; partitionIndex++) {
+                const partition = mmcInfo.parts[partitionIndex];
+                const listItem = document.createElement("li");
+                const sizeText = partition.size ? bytesToHuman(partition.size) : t("sysinfo.unknown");
                 listItem.textContent = (partition.name || "-") + " (" + sizeText + ")";
                 list.appendChild(listItem);
             }
             extra.appendChild(list);
         } else {
-            var empty = document.createElement("div");
+            const empty = document.createElement("div");
             empty.className = "sysinfo-line";
             empty.textContent = t("sysinfo.mmc.none", "No partitions");
             extra.appendChild(empty);
@@ -649,7 +799,7 @@ function renderSysInfo() {
         details.appendChild(extra);
         sysinfoContainer.appendChild(details);
 
-        var toggleExpanded = function () {
+        const toggleExpanded = () => {
             details.open ? sysinfoContainer.classList.add("sysinfo-expanded") : sysinfoContainer.classList.remove("sysinfo-expanded");
         };
         details.addEventListener("toggle", toggleExpanded);
@@ -660,7 +810,7 @@ function renderSysInfo() {
 function getSysInfo() {
     // Always fetch sysinfo into APP_STATE (used by features like backup filename),
     // but only render when the sysinfo element exists on current page.
-    var sysinfoElement = document.getElementById("sysinfo");
+    const sysinfoElement = document.getElementById("sysinfo");
     sysinfoElement && renderSysInfo();
     ajax({
         url: "/sysinfo",
@@ -685,9 +835,9 @@ async function ensureSysInfoLoaded() {
 
     APP_STATE._sysinfo_promise = (async function () {
         try {
-            var response = await fetch("/sysinfo", { method: "GET" });
+            const response = await fetch("/sysinfo", { method: "GET" });
             if (!response || !response.ok) return null;
-            var payload = await response.json();
+            const payload = await response.json();
             payload && (APP_STATE.sysinfo = payload);
             return payload;
         } catch (error) {
@@ -725,7 +875,7 @@ function getCurrentMtdLayout() {
         url: "/getmtdlayout",
         done: function (resp) {
             if (!resp || resp === "error") return;
-            var parts = resp.split(";");
+            const parts = resp.split(";");
             if (parts.length > 0 && parts[0]) {
                 APP_STATE.mtd_layout_current = parts[0];
                 renderSysInfo();
@@ -742,7 +892,7 @@ function getmtdlayoutlist() {
     ajax({
         url: "/getmtdlayout",
         done: function (responseText) {
-            var layoutNames, currentLayoutElement, chooseLayoutElement, layoutSelect, layoutIndex, layoutContainer;
+            let layoutNames, currentLayoutElement, chooseLayoutElement, layoutSelect, layoutIndex, layoutContainer;
             if (responseText != "error" && (layoutNames = responseText.split(";"), currentLayoutElement = document.getElementById("current_mtd_layout"), currentLayoutElement && (currentLayoutElement.innerHTML = t("label.current_mtd") + layoutNames[0]), chooseLayoutElement = document.getElementById("choose_mtd_layout"), chooseLayoutElement && (chooseLayoutElement.textContent = t("label.choose_mtd")), layoutSelect = document.getElementById("mtd_layout_label"), layoutSelect)) {
                 for (layoutSelect.options.length = 0, layoutIndex = 1; layoutIndex < layoutNames.length; layoutIndex++) layoutNames[layoutIndex].length > 0 && layoutSelect.options.add(new Option(layoutNames[layoutIndex], layoutNames[layoutIndex]));
                 layoutContainer = document.getElementById("mtd_layout");
@@ -756,7 +906,7 @@ function getversion() {
     ajax({
         url: "/version",
         done: function (versionText) {
-            var versionElement = document.getElementById("version");
+            const versionElement = document.getElementById("version");
             versionElement && (versionElement.innerHTML = versionText);
             ensureBranding()
         }
@@ -764,19 +914,19 @@ function getversion() {
 }
 
 function upload(formFieldName) {
-    var selectedFile = document.getElementById("file").files[0],
-        formElement, hintElement, progressBarElement, formData, layoutSelect, layoutIndex, selectedLayoutName;
+    const selectedFile = document.getElementById("file").files[0];
+    let formElement, hintElement, progressBarElement, formData, layoutSelect, layoutIndex, selectedLayoutName;
     selectedFile && (selectedLayoutName = selectedFile.name || "", formElement = document.getElementById("form"), formElement && (formElement.style.display = "none"), hintElement = document.getElementById("hint"), hintElement && (hintElement.style.display = "none"), progressBarElement = document.getElementById("bar"), progressBarElement && (progressBarElement.style.display = "block"), formData = new FormData, formData.append(formFieldName, selectedFile), layoutSelect = document.getElementById("mtd_layout_label"), layoutSelect && layoutSelect.options.length > 0 && (layoutIndex = layoutSelect.selectedIndex, formData.append("mtd_layout", layoutSelect.options[layoutIndex].value)), ajax({
-        url: "/upload",
-        data: formData,
-        done: function (responseText) {
-            var responseParts, sizeElement, md5Element, mtdElement, upgradeElement, filenameElement, md5InName, md5Hint, md5Ok, md5Match, md5Class;
-            responseText == "fail" ? location = "/fail.html" : (responseParts = responseText.split(" "), filenameElement = document.getElementById("filename"), filenameElement && selectedLayoutName && (filenameElement.style.display = "block", filenameElement.innerHTML = "<span class=\"filename-label\">" + t("label.file") + "</span><span class=\"filename-value\">" + selectedLayoutName + "</span>"), sizeElement = document.getElementById("size"), sizeElement && (sizeElement.style.display = "block", sizeElement.innerHTML = t("label.size") + responseParts[0]), md5Element = document.getElementById("md5"), md5Match = selectedLayoutName ? /(?:^|[._-])md5-([0-9a-fA-F]{32})(?:$|[._-])/.exec(selectedLayoutName) : null, md5InName = md5Match && md5Match[1] ? md5Match[1] : "", md5Element && (md5Element.style.display = "block", md5Ok = responseParts[1] && md5InName && String(responseParts[1]).toLowerCase() === String(md5InName).toLowerCase(), md5Hint = md5InName ? (md5Ok ? t("md5.match") : t("md5.mismatch")) : "", md5Class = md5InName ? (md5Ok ? "md5-ok" : "md5-bad") : "", md5Element.innerHTML = t("label.md5") + responseParts[1] + (md5Hint ? " <span class=\"md5-status " + md5Class + "\">" + md5Hint + "</span>" : "")), mtdElement = document.getElementById("mtd"), mtdElement && responseParts[2] && (mtdElement.style.display = "block", mtdElement.innerHTML = t("label.mtd") + responseParts[2]), upgradeElement = document.getElementById("upgrade"), upgradeElement && (upgradeElement.style.display = "block"))
+                url: "/upload",
+                data: formData,
+                done: function (responseText) {
+                    let responseParts, sizeElement, md5Element, mtdElement, upgradeElement, filenameElement, md5InName, md5Hint, md5Ok, md5Match, md5Class;
+                    responseText == "fail" ? location = "/fail.html" : (responseParts = responseText.split(" "), filenameElement = document.getElementById("filename"), filenameElement && selectedLayoutName && (filenameElement.style.display = "block", filenameElement.innerHTML = `<span class="filename-label">${t("label.file")}</span><span class="filename-value">${selectedLayoutName}</span>`), sizeElement = document.getElementById("size"), sizeElement && (sizeElement.style.display = "block", sizeElement.innerHTML = `${t("label.size")}${responseParts[0]}`), md5Element = document.getElementById("md5"), md5Match = selectedLayoutName ? /(?:^|[._-])md5-([0-9a-fA-F]{32})(?:$|[._-])/.exec(selectedLayoutName) : null, md5InName = md5Match && md5Match[1] ? md5Match[1] : "", md5Element && (md5Element.style.display = "block", md5Ok = responseParts[1] && md5InName && String(responseParts[1]).toLowerCase() === String(md5InName).toLowerCase(), md5Hint = md5InName ? (md5Ok ? t("md5.match") : t("md5.mismatch")) : "", md5Class = md5InName ? (md5Ok ? "md5-ok" : "md5-bad") : "", md5Element.innerHTML = `${t("label.md5")}${responseParts[1]}${md5Hint ? ` <span class="md5-status ${md5Class}">${md5Hint}</span>` : ""}`), mtdElement = document.getElementById("mtd"), mtdElement && responseParts[2] && (mtdElement.style.display = "block", mtdElement.innerHTML = `${t("label.mtd")}${responseParts[2]}`), upgradeElement = document.getElementById("upgrade"), upgradeElement && (upgradeElement.style.display = "block"))
         },
         progress: function (progressEvent) {
             if (progressEvent.total) {
-                var percent = parseInt(progressEvent.loaded / progressEvent.total * 100),
-                    progressElement = document.getElementById("bar");
+                const percent = parseInt(progressEvent.loaded / progressEvent.total * 100);
+                const progressElement = document.getElementById("bar");
                 progressElement && (progressElement.style.display = "block", progressElement.style.setProperty("--percent", percent))
             }
         }
@@ -784,13 +934,22 @@ function upload(formFieldName) {
 }
 
 function bytesToHuman(bytes) {
-    var numericBytes;
-    return bytes === null || bytes === undefined ? "" : (numericBytes = Number(bytes), !isFinite(numericBytes) || numericBytes < 0) ? "" : numericBytes >= 1024 * 1024 * 1024 ? (numericBytes / (1024 * 1024 * 1024)).toFixed(2) + " GiB" : numericBytes >= 1024 * 1024 ? (numericBytes / (1024 * 1024)).toFixed(2) + " MiB" : numericBytes >= 1024 ? (numericBytes / 1024).toFixed(2) + " KiB" : String(Math.floor(numericBytes)) + " B"
+    if (bytes === null || bytes === undefined) return "";
+    const numericBytes = Number(bytes);
+    if (!isFinite(numericBytes) || numericBytes < 0) return "";
+    if (numericBytes >= 1024 * 1024 * 1024) return (numericBytes / (1024 * 1024 * 1024)).toFixed(2) + " GiB";
+    if (numericBytes >= 1024 * 1024) return (numericBytes / (1024 * 1024)).toFixed(2) + " MiB";
+    if (numericBytes >= 1024) return (numericBytes / 1024).toFixed(2) + " KiB";
+    return String(Math.floor(numericBytes)) + " B";
 }
 
 function parseFilenameFromDisposition(dispositionHeader) {
-    var quotedFilenameMatch, unquotedFilenameMatch;
-    return dispositionHeader ? (quotedFilenameMatch = /filename\s*=\s*"([^"]+)"/i.exec(dispositionHeader), quotedFilenameMatch && quotedFilenameMatch[1]) ? quotedFilenameMatch[1] : (unquotedFilenameMatch = /filename\s*=\s*([^;\s]+)/i.exec(dispositionHeader), unquotedFilenameMatch && unquotedFilenameMatch[1] ? unquotedFilenameMatch[1].replace(/^"|"$/g, "") : "") : ""
+    if (!dispositionHeader) return "";
+    const quotedMatch = /filename\s*=\s*"([^"]+)"/i.exec(dispositionHeader);
+    if (quotedMatch && quotedMatch[1]) return quotedMatch[1];
+    const unquotedMatch = /filename\s*=\s*([^;\s]+)/i.exec(dispositionHeader);
+    if (unquotedMatch && unquotedMatch[1]) return unquotedMatch[1].replace(/^"|"$/g, "");
+    return "";
 }
 
 function sanitizeFilenameComponent(value) {
@@ -798,15 +957,18 @@ function sanitizeFilenameComponent(value) {
 }
 
 function getNowYYYYMMDD() {
-    var now = new Date, year = now.getFullYear(), month = now.getMonth() + 1, day = now.getDate();
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth() + 1;
+    const day = now.getDate();
     return String(year) + String(month).padStart(2, "0") + String(day).padStart(2, "0")
 }
 
 function makeBackupDownloadName(originalName) {
-    var boardModel = (APP_STATE.sysinfo && APP_STATE.sysinfo.board && APP_STATE.sysinfo.board.model) ? APP_STATE.sysinfo.board.model : "";
-    var boardComponent = sanitizeFilenameComponent(boardModel) || "board";
-    var dateStamp = getNowYYYYMMDD();
-    var downloadName = String(originalName || "backup.bin");
+    const boardModel = (APP_STATE.sysinfo && APP_STATE.sysinfo.board && APP_STATE.sysinfo.board.model) ? APP_STATE.sysinfo.board.model : "";
+    const boardComponent = sanitizeFilenameComponent(boardModel) || "board";
+    const dateStamp = getNowYYYYMMDD();
+    let downloadName = String(originalName || "backup.bin");
 
     // Ensure it starts with backup_
     downloadName.indexOf("backup_") === 0 || (downloadName = "backup_" + downloadName.replace(/^_+/, ""));
@@ -824,15 +986,20 @@ function makeBackupDownloadName(originalName) {
 }
 
 function parseUserLen(input) {
-    var match, numericValue, suffix;
     if (!input) return null;
-    if (input = String(input).trim(), input === "") return null;
-    match = /^\s*(0x[0-9a-fA-F]+|\d+)\s*([a-zA-Z]*)\s*$/.exec(input);
+    input = String(input).trim();
+    if (input === "") return null;
+    const match = /^\s*(0x[0-9a-fA-F]+|\d+)\s*([a-zA-Z]*)\s*$/.exec(input);
     if (!match) return null;
-    numericValue = match[1].toLowerCase().indexOf("0x") === 0 ? parseInt(match[1], 16) : parseInt(match[1], 10);
+    const rawNumber = match[1];
+    const suffix = (match[2] || "").toLowerCase();
+    const numericValue = rawNumber.toLowerCase().indexOf("0x") === 0 ? parseInt(rawNumber, 16) : parseInt(rawNumber, 10);
     if (!isFinite(numericValue) || numericValue < 0) return null;
-    suffix = (match[2] || "").toLowerCase();
-    return suffix === "" ? numericValue : suffix === "k" || suffix === "kb" || suffix === "kib" ? numericValue * 1024 : null
+    if (!suffix) return numericValue;
+    if (suffix === "k" || suffix === "kb" || suffix === "kib") return Math.floor(numericValue * 1024);
+    if (suffix === "m" || suffix === "mb" || suffix === "mib") return Math.floor(numericValue * 1024 * 1024);
+    if (suffix === "g" || suffix === "gb" || suffix === "gib") return Math.floor(numericValue * 1024 * 1024 * 1024);
+    return null;
 }
 
 /* flash logic moved to flash.js */

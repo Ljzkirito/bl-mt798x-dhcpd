@@ -8,7 +8,7 @@
  * You may not use, copy, modify or distribute this file except in compliance with the license agreement.
  */
 
-var I18N = {
+const I18N = {
     en: {
         "app.name": "Recovery Mode WEBUI",
         "nav.basic": "Basic",
