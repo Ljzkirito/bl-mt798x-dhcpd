@@ -71,33 +71,6 @@ int __weak failsafe_write_image(const void *data, size_t size, failsafe_fw_t fw)
 
 static bool services_auto_started;
 
-void schedule_hook(void)
-{
-	bool need_poll = failsafe_httpd_running;
-
-#ifdef CONFIG_MTK_DHCPD
-	need_poll = need_poll || mtk_dhcpd_is_running();
-#endif
-
-	if (!services_auto_started && !failsafe_httpd_running) {
-		services_auto_started = true;
-#ifdef CONFIG_MTK_DHCPD
-		if (!mtk_dhcpd_is_running()) {
-			printf("Starting DHCP server...\n");
-			mtk_dhcpd_start();
-			need_poll = true;
-		}
-#endif
-	}
-	if (!need_poll)
-		return;
-
-#if defined(CONFIG_MTK_TCP)
-	eth_rx();
-	mtk_tcp_periodic_check();
-#endif
-}
-
 struct reboot_session {
 	bool do_reboot;
 };
