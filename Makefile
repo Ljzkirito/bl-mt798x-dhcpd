@@ -110,6 +110,9 @@ endif
 ifeq ($(origin UBIMNG), undefined)
   UBIMNG := $(if $(filter y,$(call config_bool,CONFIG_UBIMNG,n)),1,0)
 endif
+ifeq ($(origin TELNETD), undefined)
+  TELNETD := $(if $(filter y,$(call config_bool,CONFIG_TELNETD,n)),1,0)
+endif
 ifeq ($(origin COPY_BL2), undefined)
   COPY_BL2 := $(if $(filter y,$(call config_bool,CONFIG_COPY_BL2,y)),1,0)
 endif
@@ -185,17 +188,17 @@ build:
 				env -u MAKEFLAGS -u MAKELEVEL -u MFLAGS \
 				BOARD="$$board" VERSION="$(VERSION)" VARIANT="$(VARIANT)" FSTHEME="$(FSTHEME)" \
 				MULTI_LAYOUT="$(MULTI_LAYOUT)" FIXED_MTDPARTS="$(FIXED_MTDPARTS)" SIMG="$(SIMG)" \
-				UBIMNG="$(UBIMNG)" COPY_BL2="$(COPY_BL2)" SILENT="$(SILENT)" ./build.sh 2>&1 | tee "$$log_file"; \
-			else \
-				env -u MAKEFLAGS -u MAKELEVEL -u MFLAGS \
-				BOARD="$$board" VERSION="$(VERSION)" VARIANT="$(VARIANT)" FSTHEME="$(FSTHEME)" \
-				MULTI_LAYOUT="$(MULTI_LAYOUT)" FIXED_MTDPARTS="$(FIXED_MTDPARTS)" SIMG="$(SIMG)" \
-				UBIMNG="$(UBIMNG)" COPY_BL2="$(COPY_BL2)" SILENT="$(SILENT)" ./build.sh; \
-			fi; \
-		}; \
-		success_count=0; \
-		fail_count=0; \
-		total_count=0; \
+				UBIMNG="$(UBIMNG)" TELNETD="$(TELNETD)" COPY_BL2="$(COPY_BL2)" SILENT="$(SILENT)" ./build.sh 2>&1 | tee "$$log_file"; \
+		else \
+			env -u MAKEFLAGS -u MAKELEVEL -u MFLAGS \
+			BOARD="$$board" VERSION="$(VERSION)" VARIANT="$(VARIANT)" FSTHEME="$(FSTHEME)" \
+			MULTI_LAYOUT="$(MULTI_LAYOUT)" FIXED_MTDPARTS="$(FIXED_MTDPARTS)" SIMG="$(SIMG)" \
+			UBIMNG="$(UBIMNG)" TELNETD="$(TELNETD)" COPY_BL2="$(COPY_BL2)" SILENT="$(SILENT)" ./build.sh; \
+		fi; \
+	}; \
+	success_count=0; \
+	fail_count=0; \
+	total_count=0; \
 		for board in $$boards; do \
 			total_count=$$((total_count + 1)); \
 		done; \
@@ -311,12 +314,12 @@ all:
 			env -u MAKEFLAGS -u MAKELEVEL -u MFLAGS \
 			BOARD="$$board" VERSION="$(VERSION)" VARIANT="$(VARIANT)" FSTHEME="$(FSTHEME)" \
 			MULTI_LAYOUT="$(MULTI_LAYOUT)" FIXED_MTDPARTS="$(FIXED_MTDPARTS)" SIMG="$(SIMG)" \
-			UBIMNG="$(UBIMNG)" COPY_BL2="$(COPY_BL2)" SILENT="$(SILENT)" ./build.sh 2>&1 | tee "$$log_file"; \
+			UBIMNG="$(UBIMNG)" TELNETD="$(TELNETD)" COPY_BL2="$(COPY_BL2)" SILENT="$(SILENT)" ./build.sh 2>&1 | tee "$$log_file"; \
 		else \
 			env -u MAKEFLAGS -u MAKELEVEL -u MFLAGS \
 			BOARD="$$board" VERSION="$(VERSION)" VARIANT="$(VARIANT)" FSTHEME="$(FSTHEME)" \
 			MULTI_LAYOUT="$(MULTI_LAYOUT)" FIXED_MTDPARTS="$(FIXED_MTDPARTS)" SIMG="$(SIMG)" \
-			UBIMNG="$(UBIMNG)" COPY_BL2="$(COPY_BL2)" SILENT="$(SILENT)" ./build.sh; \
+			UBIMNG="$(UBIMNG)" TELNETD="$(TELNETD)" COPY_BL2="$(COPY_BL2)" SILENT="$(SILENT)" ./build.sh; \
 		fi; \
 	}; \
 	mapfile -t board_cfgs < <(collect_board_configs); \
@@ -508,6 +511,7 @@ help:
 		'  FIXED_MTDPARTS=0|1' \
 		'  SIMG=0|1' \
 		'  UBIMNG=0|1' \
+		'  TELNETD=0|1' \
 		'  SILENT=Y|N' \
 		'' \
 		'ATF / GPT helpers:' \
