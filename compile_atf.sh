@@ -1,23 +1,45 @@
 #!/bin/sh
 # ============================================================================
-# compile_atf.sh - Batch compile ATF (ARM Trusted Firmware) BL2 images
-#                  for MediaTek MT798x platforms
+# compile_atf.sh - Batch compile ATF BL2 images for MediaTek MT798x platforms
 #
-# Usage:
-#   [VERSION=2025|SP1|SP2] [ATFCFG_DIR=mt798x_atf] [CFG_SUBDIR=<subdir>] \
-#   [OUTPUT_DIR=output_bl2] [VARIANT=nonmbm|ubootmod|ubi] \
-#   [OC7981=13~18] [OC7986=16~25] ./compile_atf.sh
-#
-# Description:
-#   Scans all .config files under ATFCFG_DIR and its CFG_SUBDIR subdirectory,
-#   then builds the ATF BL2 firmware image for each config. Output files are
-#   placed in OUTPUT_DIR with md5sum embedded in the filename.
-#
-#   Supported features:
-#   - VARIANT: Applies extra options (nonmbm → NAND_SKIP_BAD, ubootmod/ubi → NAND_UBI)
-#   - OC7981:  Overclock MT7981 ARMPLL frequency (13~18 → 1300~1800 MHz)
-#   - OC7986:  Overclock MT7986 ARMPLL frequency (16~25 → 1600~2500 MHz)
+#   Run './compile_atf.sh --help' for full usage information.
 # ============================================================================
+
+print_help() {
+	cat <<EOF
+compile_atf.sh - Batch compile ATF (ARM Trusted Firmware) BL2 images
+                 for MediaTek MT798x platforms
+
+Usage:
+  [OPTIONS] ./compile_atf.sh
+
+Description:
+  Scans all .config files under ATFCFG_DIR (and its CFG_SUBDIR subdirectory),
+  then builds the ATF BL2 firmware image for each config. Output files are
+  placed in OUTPUT_DIR with md5sum embedded in the filename.
+
+Optional:
+  VERSION             Firmware version: 2025 | SP1 | SP2        (default: 2025)
+  ATFCFG_DIR          Config source directory                   (default: mt798x_atf)
+  CFG_SUBDIR          Subdirectory under ATFCFG_DIR for extra   (default: empty)
+                      configs (e.g. "normal")
+  OUTPUT_DIR          Output directory for built images         (default: output_bl2)
+  VARIANT             Apply variant options: nonmbm | ubootmod | ubi
+                      - nonmbm   → NAND_SKIP_BAD=y
+                      - ubootmod → NAND_UBI=y
+                      - ubi      → NAND_UBI=y
+  OC7981              MT7981 overclock ARMPLL freq: 13~18       (1300~1800 MHz)
+  OC7986              MT7986 overclock ARMPLL freq: 16~25       (1600~2500 MHz)
+
+Options:
+  --help, -h          Show this help message and exit
+EOF
+	exit 0
+}
+
+case "${1:-}" in
+	--help|-h) print_help ;;
+esac
 
 TOOLCHAIN_ARM=arm-linux-gnueabi-
 TOOLCHAIN_AARCH64=aarch64-linux-gnu-

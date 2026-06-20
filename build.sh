@@ -2,25 +2,7 @@
 # ============================================================================
 # build.sh - Main build script for MediaTek MT798x platforms (ATF + U-Boot)
 #
-# Usage:
-#   BOARD=<board_name> [SOC=<mt7981|mt7986|mt7987|mt7988>] \
-#   [VERSION=2025|SP1|SP2] [VARIANT=default|ubootmod|ubi|nonmbm|openwrt] \
-#   [FSTHEME=bootstrap|gl|mtk] [FIXED_MTDPARTS=0|1] [MULTI_LAYOUT=0|1] \
-#   [SIMG=0|1] [UBIMNG=0|1] [TELNETD=0|1] [COPY_BL2=0|1] ./build.sh
-#
-# Examples:
-#   BOARD=cmcc_a10 ./build.sh
-#   BOARD=cmcc_a10 VARIANT=ubootmod ./build.sh
-#   BOARD=sn_r1 VERSION=2025 ./build.sh
-#   SOC=mt7981 BOARD=cmcc_a10 ./build.sh
-#   ./build.sh --clean           # Distclean all source directories
-#
-# This script:
-#   1. Auto-detects SOC from config files if not specified
-#   2. Checks build environment (npm, python3, cross-compiler)
-#   3. Builds U-Boot with selected variant and feature flags
-#   4. Builds ATF (ARM Trusted Firmware) with the built u-boot.bin as BL33
-#   5. Copies fip.bin (and optionally bl2.img) to output/ directory
+#   Run './build.sh --help' for full usage information.
 # ============================================================================
 
 AUTHOR="Yuzhii"
@@ -46,9 +28,42 @@ TELNETD=${TELNETD:-0}
 COPY_BL2=${COPY_BL2:-1}
 clean_mode=0
 
-if [ "${1:-}" = "--clean" ] || [ "${1:-}" = "-c" ]; then
-	clean_mode=1
-fi
+print_help() {
+	cat <<EOF
+build.sh - Build ATF + U-Boot for MediaTek MT798x platforms
+
+Usage:
+  BOARD=<board> [OPTIONS] ./build.sh
+  ./build.sh --clean
+  ./build.sh --help
+
+Required:
+  BOARD               Target board name (e.g. cmcc_a10, sn_r1)
+
+Optional:
+  SOC                 SoC: mt7981 | mt7986 | mt7987 | mt7988 (auto-detected if omitted)
+  VERSION             Firmware version: 2025 | SP1 | SP2        (default: 2025)
+  VARIANT             Build variant: default | ubootmod | ubi | nonmbm | openwrt
+                      (default: default)
+  FSTHEME             Failsafe UI theme: bootstrap | gl | mtk   (default: bootstrap)
+  FIXED_MTDPARTS      Enable fixed MTD partitions: 0 | 1        (default: 1)
+  MULTI_LAYOUT        Enable multi MTD layout: 0 | 1            (default: 0)
+  SIMG                Enable failsafe SIMG support: 0 | 1       (default: 0)
+  UBIMNG              Enable failsafe UBI management: 0 | 1     (default: 0)
+  TELNETD             Enable telnetd: 0 | 1                     (default: 0)
+  COPY_BL2            Copy bl2.img to output/: 0 | 1            (default: 1)
+
+Options:
+  --clean, -c         Distclean all source directories and exit
+  --help, -h          Show this help message and exit
+EOF
+	exit 0
+}
+
+case "${1:-}" in
+	--help|-h) print_help ;;
+	--clean|-c) clean_mode=1 ;;
+esac
 
 if [ "$VERSION" = "2025" ]; then
     UBOOT_DIR=$UBOOT25
@@ -83,11 +98,7 @@ if [ "$clean_mode" = "1" ]; then
 fi
 
 if [ -z "$BOARD" ]; then
-	echo "Usage: BOARD=<board name> [SOC=mt7981|mt7986|mt7987|mt7988] VERSION=[2025|SP1|SP2] VARIANT=[default|ubootmod|ubi|nonmbm|openwrt] [UBIMNG=1] [TELNETD=1] $0"
-	echo "eg: BOARD=cmcc_a10 $0"
-	echo "eg: BOARD=cmcc_a10 VARIANT=ubootmod $0"
-	echo "eg: BOARD=sn_r1 VERSION=2025 $0"
-	echo "eg: SOC=mt7981 BOARD=cmcc_a10 $0"
+	echo "Error: BOARD is required. Run '$0 --help' for usage information."
 	exit 1
 fi
 
