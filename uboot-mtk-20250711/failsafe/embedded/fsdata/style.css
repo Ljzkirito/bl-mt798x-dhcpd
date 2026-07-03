@@ -1439,7 +1439,11 @@ ul li {
 }
 
 .hex-offset-title,
-.hex-x-title,
+.hex-x-title {
+    white-space: nowrap;
+    padding-left: 13px;
+}
+
 .hex-ascii-title {
     white-space: nowrap;
 }
@@ -1477,7 +1481,7 @@ ul li {
     color: var(--text);
     outline: none;
     font-family: var(--font-mono);
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     line-height: 1.55;
     overflow: auto;
     cursor: default;
@@ -1494,7 +1498,7 @@ ul li {
 
 .hex-byte {
     display: inline-block;
-    width: 2.2ch;
+    width: 3ch;
     text-align: center;
     cursor: pointer;
     border-radius: 2px;
