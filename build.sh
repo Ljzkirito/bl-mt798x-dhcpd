@@ -25,6 +25,7 @@ multilayout=${MULTI_LAYOUT:-0}
 simg=${SIMG:-0}
 UBIMNG=${UBIMNG:-0}
 TELNETD=${TELNETD:-0}
+NAND_RAW=${NAND_RAW:-0}
 COPY_BL2=${COPY_BL2:-1}
 clean_mode=0
 
@@ -51,6 +52,7 @@ Optional:
   SIMG                Enable failsafe SIMG support: 0 | 1       (default: 0)
   UBIMNG              Enable failsafe UBI management: 0 | 1     (default: 0)
   TELNETD             Enable telnetd: 0 | 1                     (default: 0)
+  NAND_RAW            Enable NAND raw OOB backup: 0 | 1          (default: 0)
   COPY_BL2            Copy bl2.img to output/: 0 | 1            (default: 1)
 
 Options:
@@ -355,7 +357,7 @@ echo "U-Boot Dir: $UBOOT_DIR"
 echo "ATF CFG: $ATF_CFG_PATH"
 echo "U-Boot CFG: $UBOOT_CFG_PATH"
 echo "Features: fixed-mtdparts: $fixedparts, multi-layout: $multilayout"
-echo "Failsafe: theme: $FSTHEME, simg support: $simg, ubi manger support: $UBIMNG, telnetd: $TELNETD"
+echo "Failsafe: theme: $FSTHEME, simg support: $simg, ubi manger support: $UBIMNG, telnetd: $TELNETD, nand_raw: $NAND_RAW"
 echo "COPY BL2: $COPY_BL2"
 
 echo "======================================================================"
@@ -395,6 +397,10 @@ fi
 if [ "$TELNETD" = "1" ]; then
 	echo "Build u-boot with telnetd support!"
 	echo "CONFIG_MTK_TELNETD=y" >> "$UBOOT_DIR/.config"
+fi
+if [ "$NAND_RAW" = "1" ]; then
+	echo "Build u-boot with NAND raw OOB backup support!"
+	echo "CONFIG_WEBUI_FAILSAFE_NAND_RAW=y" >> "$UBOOT_DIR/.config"
 fi
 
 make -C "$UBOOT_DIR" olddefconfig
